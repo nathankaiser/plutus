@@ -17,15 +17,16 @@ main = do
                     Just r  -> Runfiles.rlocation r "plutus/language-plutus-core/"
                     Nothing -> "."
 
-	stringFile = BSL.readFile (testDir </> "test/data/stringLiteral.plc")
-	files = (,) <$> envFile <*> stringFile
-	largeTypeFile0 = BSL.readFile (testDir </> "test/types/negation.plc")
-	largeTypeFile1 = BSL.readFile testDir </> "test/types/tail.plc")
-	largeTypeFiles = (,) <$> largeTypeFile0 <*> largeTypeFile1
-	cfg = defPrettyConfigPlcClassic defPrettyConfigPlcOptions
-	typeCompare0 = BSL.readFile (testDir </> "test/types/example.plc")
-	typeCompare1 = BSL.readFile (testDir </> "bench/example-compare.plc")
-	typeCompare = (,) <$> typeCompare0 <*> typeCompare1
+        envFile = BSL.readFile (testDir </> "test/data/addInteger.plc")
+        stringFile = BSL.readFile (testDir </> "test/data/stringLiteral.plc")
+        files = (,) <$> envFile <*> stringFile
+        largeTypeFile0 = BSL.readFile (testDir </> "test/types/negation.plc")
+        largeTypeFile1 = BSL.readFile (testDir </> "test/types/tail.plc")
+        largeTypeFiles = (,) <$> largeTypeFile0 <*> largeTypeFile1
+        cfg = defPrettyConfigPlcClassic defPrettyConfigPlcOptions
+        typeCompare0 = BSL.readFile (testDir </> "test/types/example.plc")
+        typeCompare1 = BSL.readFile (testDir </> "bench/example-compare.plc")
+        typeCompare = (,) <$> typeCompare0 <*> typeCompare1
 
     defaultMain [ env envFile $ \ f ->
                     bgroup "format"
