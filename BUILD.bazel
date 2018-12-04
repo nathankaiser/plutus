@@ -1,19 +1,10 @@
 package(default_visibility = ["//visibility:public"])
-
-sh_library(
-    name = "lib",
-    srcs = [
-        "lib.nix",
-        "iohk-nix.json",
-    ],
-)
+load(":sh_inline_test.bzl", "sh_inline_test")
 
 exports_files([
     "pkgs/default.nix",
     "nix/overlays/required.nix",
     "criterion.sh",
-    "hlint.sh",
-    "stylish-haskell.sh"
 ])
 
 load(
@@ -32,7 +23,6 @@ sh_library(
     srcs = [
         ".hlint.yaml",
     ],
-    deps = [ "//:lib"],
 )
 
 sh_library(
@@ -40,12 +30,10 @@ sh_library(
     srcs = [
         ".stylish-haskell.yaml",
     ],
-    deps = [ "//:lib"],
 )
 
-sh_test(
+sh_inline_test(
     name = "shellcheck",
-    srcs = ["@shellcheck//:bin/run.sh"],
+    script = "shellcheckTest.sh .",
     data = glob(["*.sh", "ci/*.sh", "pkgs/*.sh"]),
-    deps = [ "//:lib"],
 )

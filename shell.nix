@@ -26,9 +26,7 @@ let
       exit
     '';
   };
-  shell = localLib.withDevTools (localPackages.haskellPackages.shellFor {
-    packages = p: (map (x: p.${x}) localLib.plutusPkgList);
-  });
+  shell = localLib.withDevTools (localPackages.bazelPkg);
 
 in shell // {
   inherit fixStylishHaskell;

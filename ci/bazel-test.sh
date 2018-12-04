@@ -3,6 +3,8 @@
 
 set -euo pipefail
 
+nix build -f default.nix bazelPkg
+
 echo '~~~ Running tests with Bazel'
 
 command time --format '%e' -o eval-time.txt \
@@ -14,3 +16,4 @@ EVAL_TIME=$(cat eval-time.txt)
 rm eval-time.txt
 
 echo -e "\\e[32;1mOK: evaluation completed in $EVAL_TIME seconds with no errors\\e[0m"
+

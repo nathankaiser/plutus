@@ -121,6 +121,10 @@ let
       plutus-core-spec = pkgs.callPackage ./plutus-core-spec {};
       lazy-machine = pkgs.callPackage ./docs/fomega/lazy-machine {};
     };
+    bazelPkg = import ./bazel.nix { inherit localLib;
+      inherit (self) haskellPackages;
+      inherit (self) ghc;
+    };
     inherit (pkgs) stack2nix;
   });
 

@@ -1,10 +1,11 @@
 workspace(name = "plutus")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load(":path_repo.bzl", "path_repo")
 
 git_repository(
     name = "io_tweag_rules_haskell",
-    remote = "https://github.com/tweag/rules_haskell.git",
+    remote = "https://github.com/jbgi/rules_haskell.git",
     commit = "e134749dbdd926515be1d30495dafd8c72c26a61",
 )
 
@@ -23,172 +24,13 @@ load(
     "nixpkgs_package",
 )
 
-nixpkgs_package(
-    name = "ghc",
-    attribute_path = "ghc",
-    nix_file_content = """
-      let
-        localLib = import ./lib.nix;
-        localPackages = import ./. { pkgsGenerated = <pkgsGenerated>; 
-                                     requiredOverlay = <requiredOverlay>;
-                                     errorOverlayPath = <errorOverlay>; };
-        pkgs = localPackages.pkgs;
-        plutusPkgs = map (x: localPackages.localPackages.${x}) localLib.plutusPkgList;
-        haskellLib = pkgs.haskell.lib;
-        packageInputs = map haskellLib.getBuildInputs plutusPkgs;
-        haskellInputs = pkgs.lib.filter
-          (input: pkgs.lib.all (p: input.outPath != p.outPath) plutusPkgs)
-          (pkgs.lib.concatMap (p: p.haskellBuildInputs) packageInputs);
-        ghc = localPackages.haskellPackages.ghcWithPackages (p: 
-          haskellInputs
-        );
-      in
-        pkgs // { inherit ghc; }
-      """,
-    nix_file_deps = [
-        "@//:lib.nix",
-        "@//:default.nix",
-    ],
-    repositories = { 
-      "pkgsGenerated" : "//:pkgs/default.nix",
-      "requiredOverlay" : "//:nix/overlays/required.nix",
-      "errorOverlay" : "//:nix/overlays/force-error.nix",
-    }
-)
+path_repo(name = "ghc")
+path_repo(name = "happy")
+path_repo(name = "alex")
 
-nixpkgs_package(
-    name = "happy",
-    attribute_path = "haskellPackages.happy",
-    # For vector example. Just use `attribute_path = haskell.compiler.ghc822`
-    # when no extra packages needed.
-    nix_file_content = """
-      let
-        localPackages = import ./. { pkgsGenerated = <pkgsGenerated>; requiredOverlay = <requiredOverlay>; };
-        pkgs = localPackages.pkgs;
-      in
-        pkgs
-      """,
-    nix_file_deps = [
-        "@//:lib.nix",
-        "@//:default.nix",
-    ],
-    repositories = { 
-      "pkgsGenerated" : "//:pkgs/default.nix",
-      "requiredOverlay" : "//:nix/overlays/required.nix",
-      "errorOverlay" : "//:nix/overlays/force-error.nix",
-    }
-)
-
-nixpkgs_package(
-    name = "alex",
-    attribute_path = "haskellPackages.alex",
-    # For vector example. Just use `attribute_path = haskell.compiler.ghc822`
-    # when no extra packages needed.
-    nix_file_content = """
-      let
-        localPackages = import ./. { pkgsGenerated = <pkgsGenerated>; 
-                                     requiredOverlay = <requiredOverlay>;
-                                     errorOverlayPath = <errorOverlay>; };
-        pkgs = localPackages.pkgs;
-      in
-        pkgs
-      """,
-    nix_file_deps = [
-        "@//:lib.nix",
-        "@//:default.nix",
-    ],
-    repositories = {
-      "pkgsGenerated" : "//:pkgs/default.nix",
-      "requiredOverlay" : "//:nix/overlays/required.nix",
-      "errorOverlay" : "//:nix/overlays/force-error.nix",
-    }
-)
-
-nixpkgs_package(
-    name = "hlint",
-    nix_file_content = """
-      with import ./lib.nix;
-      let
-        localPackages = import ./. { pkgsGenerated = <pkgsGenerated>; };
-        pkgs = localPackages.pkgs;
-        script = (import iohkNix.tests.hlintScript {inherit pkgs;});
-      in
-        pkgs.stdenv.mkDerivation {
-          name = "hlintScript";
-          unpackPhase = "true";
-          buildInputs = [];
-          buildPhase = "";
-          installPhase = ''
-            mkdir -p $out/bin
-            cp ${script} $out/bin/run.sh
-          '';
-        }
-      """,
-    nix_file_deps = [
-        "@//:lib.nix",
-        "@//:default.nix",
-    ],
-    repositories = {
-        "pkgsGenerated" : "//:pkgs/default.nix",
-    }
-)
-
-nixpkgs_package(
-    name = "stylish-haskell",
-    nix_file_content = """
-      with import ./lib.nix;
-      let
-        localPackages = import ./. { pkgsGenerated = <pkgsGenerated>; };
-        pkgs = localPackages.pkgs;
-        script = (import iohkNix.tests.stylishHaskellScript {inherit pkgs;});
-      in
-        pkgs.stdenv.mkDerivation {
-          name = "stylishHaskellScript";
-          unpackPhase = "true";
-          buildInputs = [];
-          buildPhase = "";
-          installPhase = ''
-            mkdir -p $out/bin
-            cp ${script} $out/bin/run.sh
-          '';
-        }
-      """,
-    nix_file_deps = [
-        "@//:lib.nix",
-        "@//:default.nix",
-    ],
-    repositories = {
-        "pkgsGenerated" : "//:pkgs/default.nix",
-    }
-)
-
-nixpkgs_package(
-    name = "shellcheck",
-    nix_file_content = """
-      with import ./lib.nix;
-      let
-        localPackages = import ./. { pkgsGenerated = <pkgsGenerated>; };
-        pkgs = localPackages.pkgs;
-        script = (import iohkNix.tests.shellcheckScript {inherit pkgs;});
-      in
-        pkgs.stdenv.mkDerivation {
-          name = "shellcheckScript";
-          unpackPhase = "true";
-          buildInputs = [];
-          buildPhase = "";
-          installPhase = ''
-            mkdir -p $out/bin
-            cp ${script} $out/bin/run.sh
-          '';
-        }
-      """,
-    nix_file_deps = [
-        "@//:lib.nix",
-        "@//:default.nix",
-    ],
-    repositories = {
-        "pkgsGenerated" : "//:pkgs/default.nix",
-    }
-)
+path_repo(name = "stylishHaskellTest.sh")
+path_repo(name = "hlintTest.sh")
+path_repo(name = "shellcheckTest.sh")
 
 register_toolchains("//:ghc")
+

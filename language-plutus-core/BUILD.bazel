@@ -166,18 +166,18 @@ haskell_benchmark(
     ]),
 )
 
-sh_test(
+load("//:sh_inline_test.bzl", "sh_inline_test")
+
+sh_inline_test(
     name = "hlint",
-    srcs = ["@hlint//:bin/run.sh"],
-    args = ["."],
-    deps = ["//:hlint_lib"],
+    script = "hlintTest.sh .",
     data = glob(["**/*.hs"], exclude = ["**/.stack-work/**"]),
+    deps = ["//:hlint_lib"],
 )
 
-sh_test(
+sh_inline_test(
     name = "stylish",
-    srcs = ["@stylish-haskell//:bin/run.sh"],
-    args = ["language-plutus-core"],
-    deps = ["//:stylish_haskell_lib"],
+    script = "stylishHaskellTest.sh language-plutus-core",
     data = glob(["**/*.hs"], exclude = ["**/.stack-work/**"]),
+    deps = ["//:stylish_haskell_lib"],
 )

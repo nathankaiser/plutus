@@ -47,6 +47,6 @@ in pkgs.lib.fix (jobsets:  mapped // {
       in
     [
       (builtins.concatLists (map lib.attrValues (all jobsets.all-plutus-tests)))
-    ] ++ (builtins.attrValues jobsets.tests) ++ (builtins.attrValues jobsets.docs);
+    ] ++ (builtins.attrValues jobsets.tests) ++ (builtins.attrValues jobsets.docs) ++ [plutusPkgs.bazelPkg];
   });
 })
