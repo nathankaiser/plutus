@@ -1,3 +1,0 @@
-:set -XFlexibleContexts
-:m +Language.PlutusCore.Pretty
-:set -interactive-print interactivePrint

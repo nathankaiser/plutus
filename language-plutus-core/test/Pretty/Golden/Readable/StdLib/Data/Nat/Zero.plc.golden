@@ -1,1 +1,0 @@
-wrap nat (all (r :: *). r -> (nat -> r) -> r) (/\(r :: *) -> \(z : r) -> \(f : (fix nat. all (r :: *). r -> (nat -> r) -> r) -> r) -> z)
